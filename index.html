@@ -1,365 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>K&S Emulator</title>
-  
-  <!-- Fontes modernas do Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --bg-main: #0f172a;
-      --bg-panel: #1e293b;
-      --bg-editor: #020617;
-      --text-main: #cbd5e1;
-      --text-muted: #64748b;
-      --accent-blue: #6366f1;
-      --accent-blue-hover: #4f46e5;
-      --accent-cyan: #06b6d4;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --border-color: #334155;
-      --line-height: 28px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 40px 20px 20px;
-    }
-
-    header {
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      color: #f8fafc;
-      letter-spacing: -0.5px;
-      margin-bottom: 5px;
-    }
-    
-    p.subtitle {
-      color: var(--accent-cyan);
-      font-size: 14px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* --- DASHBOARD --- */
-    .dashboard {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 15px;
-      width: 100%;
-      max-width: 900px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
-    .stat-value {
-      font-family: 'Fira Code', monospace;
-      font-size: 24px;
-      font-weight: 600;
-      color: #38bdf8;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-      transition: color 0.3s;
-    }
-    
-    .stat-value.updated {
-      color: #fff;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-    }
-
-    /* --- TOOLBAR --- */
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 900px;
-      background: var(--bg-panel);
-      padding: 15px 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 25px;
-      align-items: center;
-      flex-wrap: wrap;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    button, label.btn-file {
-      background: var(--accent-blue);
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    button:hover, label.btn-file:hover {
-      background: var(--accent-blue-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4);
-    }
-
-    button:active, label.btn-file:active {
-      transform: translateY(1px);
-      box-shadow: none;
-    }
-
-    button.btn-green { background: var(--accent-green); }
-    button.btn-green:hover { background: #059669; box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4); }
-
-    button.btn-red { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
-    button.btn-red:hover { background: var(--bg-main); border-color: var(--accent-red); color: var(--accent-red); }
-
-    button.btn-file-btn { background: transparent; border: 1px solid var(--border-color); color: var(--accent-cyan); }
-    button.btn-file-btn:hover { background: var(--bg-main); border-color: var(--accent-cyan); }
-
-    label.btn-file {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--accent-cyan);
-    }
-
-    /* Slider estilizado */
-    .speed-control {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-left: auto;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100px;
-      background: transparent;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 16px;
-      width: 16px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      cursor: pointer;
-      margin-top: -6px;
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 4px;
-      cursor: pointer;
-      background: var(--bg-main);
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
-    }
-
-    /* --- EDITOR --- */
-    .editor-wrapper {
-      width: 100%;
-      max-width: 900px;
-      background: var(--bg-editor);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      display: flex;
-    }
-
-    .line-numbers {
-      padding: 15px 0;
-      background: rgba(30, 41, 59, 0.5);
-      color: var(--text-muted);
-      text-align: right;
-      font-family: 'Fira Code', monospace;
-      font-size: 15px;
-      line-height: var(--line-height);
-      user-select: none;
-      width: 50px;
-      border-right: 1px solid var(--border-color);
-    }
-
-    .line-numbers span {
-      display: block;
-      height: var(--line-height);
-      padding-right: 10px;
-      transition: all 0.2s ease;
-      border-left: 3px solid transparent;
-    }
-
-    .line-numbers span.executing {
-      background: linear-gradient(90deg, rgba(6, 182, 212, 0.15) 0%, transparent 100%);
-      border-left: 3px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-      font-weight: 600;
-    }
-
-    .line-numbers span.invalid {
-      background: linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, transparent 100%);
-      border-left: 3px solid var(--accent-red);
-      color: var(--accent-red);
-    }
-
-    textarea#input {
-      flex: 1;
-      background: transparent;
-      color: #e2e8f0;
-      border: none;
-      padding: 15px;
-      font-family: 'Fira Code', monospace;
-      font-size: 15px;
-      line-height: var(--line-height);
-      resize: none;
-      outline: none;
-      white-space: pre;
-    }
-
-    /* Rodapé */
-    footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    footer a {
-      color: var(--accent-cyan);
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-      color: #38bdf8;
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-track { background: var(--bg-main); }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 5px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-    /* Responsividade */
-    @media (max-width: 768px) {
-      .dashboard { grid-template-columns: repeat(3, 1fr); }
-      .speed-control { margin-left: 0; width: 100%; justify-content: space-between; }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K&S — Simulador</title>
+  <meta name="color-scheme" content="light dark" />
+  <script>try{const s=localStorage.getItem("ks-theme");const p=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme", s||p);}catch(e){}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <header>
-    <h1>Simulador</h1>
-    <p class="subtitle">K&S</p>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <div class="brand__title">Simulador K&amp;S</div>
+        <div class="brand__tag">Arquitetura · Conjunto K&amp;S · 32 linhas</div>
+      </div>
+      <div class="topbar__actions">
+        <button id="theme_toggle" class="theme-toggle" type="button" aria-label="Alternar tema">
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </span>
+        </button>
+        <div class="topbar__meta">
+          Feito por <strong>Lucas Schwalm</strong> · ajustado por
+          <a href="https://github.com/Lorenzo-Uergs" target="_blank" rel="noopener noreferrer">Lorenzo Garcia Bernardes</a>
+        </div>
+      </div>
+    </div>
   </header>
 
-  <!-- DASHBOARD DE REGISTRADORES -->
-  <div class="dashboard">
-    <div class="stat-card">
-      <span class="stat-label">PC</span>
-      <span class="stat-value" id="val-pc">00</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">ALU</span>
-      <span class="stat-value" id="val-alu">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">R0</span>
-      <span class="stat-value" id="val-r0">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">R1</span>
-      <span class="stat-value" id="val-r1">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">R2</span>
-      <span class="stat-value" id="val-r2">0</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">R3</span>
-      <span class="stat-value" id="val-r3">0</span>
-    </div>
-  </div>
+  <main class="page">
+    <!-- Registradores -->
+    <section class="registers" aria-label="Registradores">
+      <div class="reg">
+        <div class="reg__label">PC</div>
+        <div class="reg__value" id="val-pc">00</div>
+      </div>
+      <div class="reg">
+        <div class="reg__label">ALU</div>
+        <div class="reg__value" id="val-alu">0</div>
+      </div>
+      <div class="reg">
+        <div class="reg__label">R0</div>
+        <div class="reg__value" id="val-r0">0</div>
+      </div>
+      <div class="reg">
+        <div class="reg__label">R1</div>
+        <div class="reg__value" id="val-r1">0</div>
+      </div>
+      <div class="reg">
+        <div class="reg__label">R2</div>
+        <div class="reg__value" id="val-r2">0</div>
+      </div>
+      <div class="reg">
+        <div class="reg__label">R3</div>
+        <div class="reg__value" id="val-r3">0</div>
+      </div>
+    </section>
 
-  <!-- BARRA DE FERRAMENTAS -->
-  <div class="toolbar">
-    <button id="play_button">▶ Play</button>
-    <button id="exec_button" class="btn-green">⏩ Executar Tudo</button>
-    <button id="next_button">⏭ Passo</button>
-    <button id="reset_button" class="btn-red">🔄 Resetar</button>
-    
-    <!-- Opções de Arquivo -->
-    <button id="save_button" class="btn-file-btn">💾 Salvar</button>
-    <label for="load_file_input" class="btn-file">
-      📂 Carregar
-      <input type="file" id="load_file_input" accept=".txt,.asm" style="display: none;">
-    </label>
+    <!-- Controles -->
+    <section class="controls" aria-label="Controles">
+      <div class="controls__group">
+        <button id="play_button" class="btn btn--primary" type="button" aria-label="Executar / Pausar">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 2.2L11 7L3 11.8V2.2Z" fill="currentColor"/></svg>
+          <span>Executar</span>
+        </button>
+        <button id="exec_button" class="btn btn--ghost" type="button">Executar tudo</button>
+        <button id="next_button" class="btn btn--ghost" type="button">Passo</button>
+      </div>
 
-    <div class="speed-control">
-      <label for="speed">Velocidade</label>
-      <input type="range" id="speed" min="100" max="1900" value="1500">
-    </div>
-  </div>
+      <div class="controls__divider" aria-hidden="true"></div>
 
-  <!-- EDITOR DE CÓDIGO -->
-  <div class="editor-wrapper">
-    <div class="line-numbers" id="line-numbers"></div>
-    <textarea id="input" rows="32" spellcheck="false">
-LOAD R1 10
+      <div class="controls__group">
+        <button id="reset_button" class="btn btn--quiet" type="button">Resetar</button>
+        <button id="save_button" class="btn btn--quiet" type="button">Salvar .txt</button>
+        <label for="load_file_input" class="btn btn--quiet" style="cursor:pointer;">
+          Carregar
+          <input type="file" id="load_file_input" class="file-input" accept=".txt,.asm" />
+        </label>
+      </div>
+
+      <div class="controls__speed">
+        <label for="speed">Velocidade</label>
+        <input type="range" id="speed" min="100" max="1900" value="1500" />
+      </div>
+    </section>
+
+    <div id="exec-status" class="exec-status" role="status" aria-live="polite"></div>
+
+    <!-- Editor -->
+    <section class="editor" aria-label="Editor de código">
+      <div class="editor__gutter" id="line-numbers" aria-hidden="true"></div>
+      <textarea id="input" class="editor__input" rows="32" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" aria-label="Código assembly — 32 linhas">LOAD R1 10
 LOAD R2 11
 ADD R0 R1 R2
 STORE 12 R0
@@ -371,311 +109,14 @@ HALT
 
 15
 25</textarea>
-  </div>
+    </section>
 
-  <footer>
-    Feito por <strong>Lucas Schwalm</strong> e ajustado por <a href="https://github.com/Lorenzo-Uergs" target="_blank" rel="noopener noreferrer">Lorenzo Garcia Bernardes</a>
-  </footer>
+    <footer class="foot">
+      <span>Instruções: <code>LOAD</code> · <code>STORE</code> · <code>MOVE</code> · <code>ADD</code> · <code>SUB</code> · <code>AND</code> · <code>OR</code> · <code>BRANCH</code> · <code>BZERO</code> · <code>BNEG</code> · <code>HALT</code> · <code>NOP</code> — memória 0–31, registradores R0–R3.</span>
+      <span>32 linhas · PC 00–31</span>
+    </footer>
+  </main>
 
-  <script>
-    // --- INICIALIZAÇÃO DA INTERFACE ---
-    const lineNumbersContainer = document.getElementById("line-numbers");
-    lineNumbersContainer.innerHTML = Array.from({ length: 32 }, (_, i) => `<span>${i}</span>`).join("");
-
-    function GetOrCrash(thingID) {
-      const thing = document.getElementById(thingID);
-      if (!thing) {
-        alert(`O id ${thingID} não foi encontrado.`);
-        throw new Error(`O id ${thingID} não foi encontrado.`);
-      }
-      return thing;
-    }
-
-    // --- ESTADO DO PROCESSADOR ---
-    let PC = 0;
-    let ALU = 0;
-    const Regs = { R0: 0, R1: 0, R2: 0, R3: 0 };
-    const LineNumbersSpans = lineNumbersContainer.children;
-    
-    let Executing = false;
-    let delayUpperLimit = 2000;
-    const speed = GetOrCrash("speed");
-
-    // --- FUNÇÕES DE CONTROLE ---
-    function StopExec() {
-      Executing = false;
-    }
-
-    function playLoop() {
-      if (Executing) {
-        Execute();
-        const delay = -1 * Number.parseInt(speed.value) + delayUpperLimit;
-        window.setTimeout(playLoop, delay);
-      }
-    }
-
-    function Reset() {
-      StopExec();
-      SetPC(0);
-      for (const line of LineNumbersSpans) {
-        line.classList.remove("invalid");
-        line.classList.remove("executing");
-      }
-      SetReg("R0", 0);
-      SetReg("R1", 0);
-      SetReg("R2", 0);
-      SetReg("R3", 0);
-      SetALU(0);
-      UpdateDisplay(true);
-    }
-
-    // --- EVENTOS DOS BOTÕES ---
-    GetOrCrash("play_button").onclick = function() {
-      if (Executing) {
-        StopExec();
-        this.innerHTML = "▶ Play";
-      } else {
-        Executing = true;
-        this.innerHTML = "⏸ Pause";
-        playLoop();
-      }
-    };
-
-    GetOrCrash("exec_button").onclick = () => {
-      StopExec();
-      GetOrCrash("play_button").innerHTML = "▶ Play";
-      let running = 0;
-      Executing = true;
-      while (Executing) {
-        if (running++ > 2000) {
-          alert("Loops não podem superar 2000 execuções! Há um loop infinito.");
-          StopExec();
-          throw new Error("Tem um loop infinito ai!");
-        }
-        Execute();
-      }
-    };
-
-    GetOrCrash("next_button").onclick = () => {
-      StopExec();
-      GetOrCrash("play_button").innerHTML = "▶ Play";
-      Execute();
-    };
-
-    GetOrCrash("reset_button").onclick = () => {
-      GetOrCrash("play_button").innerHTML = "▶ Play";
-      Reset();
-    };
-
-    // --- FUNÇÕES DE SALVAR E CARREGAR ---
-    GetOrCrash("save_button").onclick = () => {
-      const code = GetOrCrash("input").value;
-      const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "programa_assembly.txt";
-      link.click();
-      URL.revokeObjectURL(link.href);
-    };
-
-    GetOrCrash("load_file_input").onchange = (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        GetOrCrash("input").value = e.target.result;
-        Reset();
-      };
-      reader.readAsText(file);
-      event.target.value = ""; // Limpa a seleção
-    };
-
-    // --- VALIDAÇÕES ---
-    function ValidateReg(...regs) {
-      for (const reg of regs) {
-        if (!reg || reg[0] !== "R" || Number.parseInt(reg[1]) > 3 || Number.parseInt(reg[1]) < 0) {
-          throw new Error(`Erro na sintaxe do registrador na linha ${PC}`);
-        }
-      }
-    }
-
-    function ValidateMem(...mems) {
-      for (const mem of mems) {
-        if (Number.isNaN(Number.parseInt(mem)) || Number.parseInt(mem) < 0 || Number.parseInt(mem) > 31) {
-          throw new Error(`Erro na sintaxe da memória na linha ${PC}`);
-        }
-      }
-    }
-
-    // --- CONJUNTO DE INSTRUÇÕES (ISA) ---
-    function HALT() {
-      StopExec();
-      GetOrCrash("play_button").innerHTML = "▶ Play";
-    }
-
-    function NOP() {}
-
-    function LOAD([reg, mem]) {
-      ValidateReg(reg);
-      ValidateMem(mem);
-      const content = Lines()[Number.parseInt(mem)] || "0";
-      const content_int = Number.parseInt(content);
-      if (Number.isNaN(content_int)) throw new Error(`Erro na linha ${PC}`);
-      SetReg(reg, content_int);
-    }
-
-    function MOVE([reg1, reg2]) {
-      ValidateReg(reg1, reg2);
-      const temp = GetReg(reg1);
-      SetReg(reg1, GetReg(reg2) ?? 0);
-      SetReg(reg2, temp || 0);
-    }
-
-    function STORE([mem, reg]) {
-      ValidateReg(reg);
-      ValidateMem(mem);
-      const tempLines = Lines();
-      tempLines[Number.parseInt(mem)] = `${GetReg(reg)}`;
-      GetOrCrash("input").value = tempLines.join("\n");
-    }
-
-    function ADD([reg1, reg2, reg3]) {
-      ValidateReg(reg1, reg2, reg3);
-      const sum = GetReg(reg2) + GetReg(reg3);
-      if (Number.isNaN(sum)) throw new Error(`Erro na linha ${PC}`);
-      SetReg(reg1, sum);
-      SetALU(sum);
-    }
-
-    function SUB([reg1, reg2, reg3]) {
-      ValidateReg(reg1, reg2, reg3);
-      const sub = GetReg(reg2) - GetReg(reg3);
-      if (Number.isNaN(sub)) throw new Error(`Erro na linha ${PC}`);
-      SetReg(reg1, sub);
-      SetALU(sub);
-    }
-
-    function AND([reg1, reg2, reg3]) {
-      ValidateReg(reg1, reg2, reg3);
-      const bin1 = GetReg(reg2).toString(2).padStart(16, '0');
-      const bin2 = GetReg(reg3).toString(2).padStart(16, '0');
-      let bin3 = "";
-      for (let i = 0; i < bin1.length; i++) {
-        bin3 += bin1[i] === "1" && bin2[i] === "1" ? "1" : "0";
-      }
-      const result = Number.parseInt(bin3, 2);
-      SetReg(reg1, result);
-      SetALU(result);
-    }
-
-    function OR([reg1, reg2, reg3]) {
-      ValidateReg(reg1, reg2, reg3);
-      const bin1 = GetReg(reg2).toString(2).padStart(16, '0');
-      const bin2 = GetReg(reg3).toString(2).padStart(16, '0');
-      let bin3 = "";
-      for (let i = 0; i < bin1.length; i++) {
-        bin3 += bin1[i] === "1" || bin2[i] === "1" ? "1" : "0";
-      }
-      const result = Number.parseInt(bin3, 2);
-      SetReg(reg1, result);
-      SetALU(result);
-    }
-
-    function BRANCH([mem]) {
-      ValidateMem(mem);
-      SetPC(Number.parseInt(mem) - 1);
-    }
-
-    function BZERO([mem]) {
-      ValidateMem(mem);
-      if (ALU === 0) SetPC(Number.parseInt(mem) - 1);
-    }
-
-    function BNEG([mem]) {
-      ValidateMem(mem);
-      if (ALU < 0) SetPC(Number.parseInt(mem) - 1);
-    }
-
-    const MapInstructions = {
-      SUB, STORE, OR, NOP, MOVE, LOAD, HALT, BZERO, BRANCH, BNEG, AND, ADD
-    };
-
-    // --- FUNÇÕES CORE DA CPU ---
-    function SetPC(pc) { PC = pc; }
-    function SetALU(alu) { ALU = alu; }
-    function GetReg(key) { return Regs[key]; }
-    function SetReg(key, value) { return Regs[key] = value; }
-
-    function Lines() {
-      const textarea = GetOrCrash("input");
-      const linesArr = textarea.value.split("\n");
-      while(linesArr.length < 32) linesArr.push("");
-      return linesArr;
-    }
-
-    function Execute() {
-      if (PC >= 32 || PC < 0) {
-        StopExec();
-        GetOrCrash("play_button").innerHTML = "▶ Play";
-        return;
-      }
-
-      for (const line of LineNumbersSpans) line.classList.remove("invalid");
-
-      const actualLine = Lines()[PC];
-      if (!actualLine || actualLine.trim() === "") {
-        PC++;
-        UpdateDisplay();
-        return;
-      }
-
-      try {
-        const parts = actualLine.trim().split(/\s+/);
-        const instruction = parts[0].toUpperCase();
-        const params = parts.slice(1).map(p => p.toUpperCase()); 
-        
-        if (MapInstructions[instruction]) {
-          MapInstructions[instruction](params);
-          PC++;
-        } else {
-          throw new Error("Instrução desconhecida");
-        }
-      } catch (err) {
-        console.error(err);
-        for (const line of LineNumbersSpans) line.classList.remove("executing");
-        LineNumbersSpans[PC].classList.add("invalid");
-        StopExec();
-        GetOrCrash("play_button").innerHTML = "▶ Play";
-      }
-      UpdateDisplay();
-    }
-
-    function updateDOMValue(id, newValue) {
-      const el = GetOrCrash(id);
-      if (el.innerText !== String(newValue)) {
-        el.innerText = newValue;
-        el.classList.add("updated");
-        setTimeout(() => el.classList.remove("updated"), 200);
-      }
-    }
-
-    function UpdateDisplay(force = false) {
-      if (PC >= 0 && PC < 32) {
-        updateDOMValue("val-pc", PC.toString().padStart(2, '0'));
-        updateDOMValue("val-alu", ALU);
-        updateDOMValue("val-r0", Regs.R0);
-        updateDOMValue("val-r1", Regs.R1);
-        updateDOMValue("val-r2", Regs.R2);
-        updateDOMValue("val-r3", Regs.R3);
-
-        for (const line of LineNumbersSpans) line.classList.remove("executing");
-        LineNumbersSpans[PC].classList.add("executing");
-      }
-    }
-
-    // Boot
-    UpdateDisplay(true);
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
